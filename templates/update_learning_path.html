@@ -1,0 +1,30 @@
+<form id="updateLearningPathForm">
+    <div class="mb-3">
+        <label for="task_name" class="form-label">Task Name</label>
+        <input type="text" class="form-control" id="task_name" name="task_name" value="{{ form.task_name.value|default_if_none:'' }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="start_date" class="form-label">Start Date</label>
+        <input type="date" class="form-control" id="start_date" name="start_date" value="{{ form.start_date.value|date:'Y-m-d'|default_if_none:'' }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="estimated_end_date" class="form-label">Estimated End Date</label>
+        <input type="date" class="form-control" id="estimated_end_date" name="estimated_end_date" value="{{ form.estimated_end_date.value|date:'Y-m-d'|default_if_none:'' }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="required_duration" class="form-label">Required Duration</label>
+        <input type="text" class="form-control" id="required_duration" name="required_duration" value="{{ form.required_duration.value|default_if_none:'' }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="used_leave" class="form-label">Used Leave (Optional)</label>
+        <input type="text" class="form-control" id="used_leave" name="used_leave" value="{{ form.used_leave.value|default_if_none:'' }}">
+    </div>
+    <div class="mb-3">
+        <label for="notes" class="form-label">Notes (Optional)</label>
+        <textarea class="form-control" id="notes" name="notes" rows="3">{{ form.notes.value|default_if_none:'' }}</textarea>
+    </div>
+    <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="is_completed" name="is_completed" {% if form.is_completed.value %}checked{% endif %}>
+        <label class="form-check-label" for="is_completed">Completed</label>
+    </div>
+</form>

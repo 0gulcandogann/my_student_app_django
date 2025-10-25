@@ -1,0 +1,316 @@
+<!-- templates/list_student.html -->
+
+{% extends 'dashboard.html' %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h3 class="font-md mb-4 text-center" style="color: #6e48aa;">List of Students</h3>
+        <!-- Arama Çubuğu (Sağda) -->
+        <div class="mb-4 d-flex justify-content-end">
+            <div class="input-group" style="max-width: 400px;">
+                <span class="input-group-text search-icon">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" class="form-control search-input" id="searchInput" placeholder="Search students..." onkeyup="searchStudents()">
+            </div>
+        </div>
+        <!-- Öğrenci Kartları -->
+        <div id="student-list">
+            {% if students %}
+                {% for student in students %}
+                    <div class="card shadow-lg mb-3 student-card">
+                        <div class="d-flex align-items-center p-3">
+                            <!-- Sol Tarafta Fotoğraf -->
+                            <div class="student-photo-container me-3">
+                                {% if student.photo %}
+                                    <img src="/media/{{ student.photo }}" alt="{{ student.first_name }} {{ student.last_name }}" class="student-photo">
+                                {% else %}
+                                    <div class="photo-placeholder">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <!-- Sağ Tarafta Bilgiler -->
+                            <div class="flex-grow-1">
+                                <h5 class="mb-1">{{ student.first_name }} {{ student.last_name }}</h5>
+                                <p class="mb-1"><strong>Student ID:</strong> {{ student.student_id }}</p>
+                                <p class="mb-1"><strong>Created At:</strong> {{ student.created_at }}</p>
+                            </div>
+                            <!-- Butonlar -->
+                            <div class="button-group">
+                                <!-- Details Simgesi -->
+                                <button type="button" class="btn custom-btn-info" data-bs-toggle="modal" data-bs-target="#studentModal{{ student.id }}">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                                <a href="{% url 'update_student' student.id %}" class="btn custom-btn-update">Update</a>
+                                <form method="post" action="{% url 'delete_student' student.id %}" onsubmit="return confirm('Are you sure you want to delete this student?')" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn custom-btn-danger">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="studentModal{{ student.id }}" tabindex="-1" aria-labelledby="studentModalLabel{{ student.id }}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="studentModalLabel{{ student.id }}">Student Details</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="d-flex align-items-center">
+                                        <!-- Sol Tarafta Profil Resmi -->
+                                        <div class="me-4">
+                                            {% if student.photo %}
+                                                <img src="/media/{{ student.photo }}" alt="{{ student.first_name }} {{ student.last_name }}" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
+                                            {% else %}
+                                                <div class="photo-placeholder" style="width: 100px; height: 100px; font-size: 3rem;">
+                                                    <i class="fas fa-user"></i>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <!-- Sağ Tarafta Detaylar -->
+                                        <div>
+                                            <p><strong>Student ID:</strong> {{ student.student_id }}</p>
+                                            <p><strong>First Name:</strong> {{ student.first_name }}</p>
+                                            <p><strong>Last Name:</strong> {{ student.last_name }}</p>
+                                            <p><strong>Created At:</strong> {{ student.created_at }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-light text-center custom-alert">
+                    <span class="text-black">No students found.</span>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <style>
+        /* Kart için stil */
+        .card {
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .student-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Fotoğraf için stil */
+        .student-photo-container {
+            width: 80px;
+            height: 80px;
+            position: relative;
+        }
+
+        .student-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .student-photo:hover {
+            transform: scale(1.1);
+        }
+
+        .photo-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f1f3f5;
+            border-radius: 50%;
+            color: #6e48aa;
+            font-size: 2rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Arama çubuğu için stil */
+        .search-input {
+            border-radius: 8px 0 0 8px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #6e48aa;
+            box-shadow: 0 0 8px rgba(110, 72, 170, 0.3);
+            outline: none;
+        }
+
+        .search-icon {
+            background: linear-gradient(90deg, #6e48aa, #9d50bb);
+            color: #fff;
+            border: none;
+            border-radius: 0 8px 8px 0;
+            padding: 0 15px;
+        }
+
+        /* Bilgi metinleri için stil */
+        h5 {
+            color: #333;
+            font-weight: 600;
+        }
+
+        p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        /* Buton grubu için stil */
+        .button-group {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Butonlar arasında boşluk */
+        }
+
+        /* Details butonu için stil */
+        .custom-btn-info {
+            background: linear-gradient(90deg, #17a2b8, #138496);
+            color: #fff;
+            padding: 8px; /* Daha küçük padding, simge odaklı */
+            font-size: 1rem; /* Simge boyutu için uygun */
+            border: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            width: 40px; /* Önceki kompakt boyut */
+            height: 40px; /* Kare bir görünüm için */
+            display: flex; /* İkonu ortalamak için */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .custom-btn-info:hover {
+            background: linear-gradient(90deg, #138496, #0f6674);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Update butonu için stil */
+        .custom-btn-update {
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            color: #fff;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            border: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            width: 80px; /* Sabit genişlik */
+            text-align: center;
+        }
+
+        .custom-btn-update:hover {
+            background: linear-gradient(90deg, #0056b3, #003d82);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Delete butonu için stil */
+        .custom-btn-danger {
+            background: linear-gradient(90deg, #dc3545, #e4606d);
+            color: #fff;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            border: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            width: 80px; /* Sabit genişlik */
+            text-align: center;
+        }
+
+        .custom-btn-danger:hover {
+            background: linear-gradient(90deg, #b02a37, #c14b55);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Alert için stil */
+        .custom-alert {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            font-style: italic;
+            color: #666;
+        }
+
+        .text-black {
+            color: #000 !important;
+        }
+
+        /* Modal için stil */
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+            color: #6e48aa;
+        }
+
+        .modal-title {
+            font-weight: 600;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+        }
+
+        .modal-body p {
+            margin: 0 0 10px;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .modal-body p strong {
+            color: #6e48aa;
+        }
+    </style>
+
+    <script>
+        // Arama fonksiyonu
+        function searchStudents() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const studentCards = document.getElementsByClassName('student-card');
+
+            for (let i = 0; i < studentCards.length; i++) {
+                const studentName = studentCards[i].getElementsByTagName('h5')[0].innerText.toLowerCase();
+                const studentId = studentCards[i].getElementsByTagName('p')[0].innerText.toLowerCase();
+                if (studentName.includes(input) || studentId.includes(input)) {
+                    studentCards[i].style.display = '';
+                } else {
+                    studentCards[i].style.display = 'none';
+                }
+            }
+        }
+    </script>
+{% endblock %}

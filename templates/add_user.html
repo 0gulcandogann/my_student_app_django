@@ -1,0 +1,188 @@
+{% extends 'dashboard.html' %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h3 class="font-md mb-4 text-center" style="color: #6e48aa;">Add New User</h3>
+        <div class="card shadow-lg p-4">
+            <form method="post" id="add-user-form">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="email" class="form-label">E-mail Address</label>
+                    <input class="form-control custom-input" type="email" name="email" id="email" placeholder="E-mail Address" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input class="form-control custom-input" type="password" name="password" id="password" placeholder="Password" required>
+                </div>
+                <!-- Şifre Kuralları -->
+                <div class="card bg-light p-3 mb-3 custom-subcard">
+                    <p class="mb-2"><strong>Password Requirements:</strong></p>
+                    <ul class="list-unstyled ms-2">
+                        <li class="d-flex align-items-center mb-2">
+                            <span id="length-check" class="me-2"><i class="fas fa-times-circle text-danger"></i></span>
+                            At least 8 characters long
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <span id="uppercase-check" class="me-2"><i class="fas fa-times-circle text-danger"></i></span>
+                            At least one uppercase letter
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <span id="lowercase-check" class="me-2"><i class="fas fa-times-circle text-danger"></i></span>
+                            At least one lowercase letter
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <span id="digit-check" class="me-2"><i class="fas fa-times-circle text-danger"></i></span>
+                            At least one digit
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <span id="special-check" class="me-2"><i class="fas fa-times-circle text-danger"></i></span>
+                            At least one special character (e.g., !@#$%^&*)
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <span id="no-space-check" class="me-2"><i class="fas fa-times-circle text-danger"></i></span>
+                            No spaces allowed
+                        </li>
+                    </ul>
+                </div>
+                <div class="mb-3">
+                    <label for="first_name" class="form-label">First Name (Optional)</label>
+                    <input class="form-control custom-input" type="text" name="first_name" id="first_name" placeholder="First Name (Optional)">
+                </div>
+                <div class="mb-3">
+                    <label for="last_name" class="form-label">Last Name (Optional)</label>
+                    <input class="form-control custom-input" type="text" name="last_name" id="last_name" placeholder="Last Name (Optional)">
+                </div>
+                <div class="form-check form-switch mb-4">
+                    <input class="form-check-input" type="checkbox" name="is_admin" id="is_admin">
+                    <label class="form-check-label" for="is_admin">Super User</label>
+                </div>
+                <div class="form-button d-flex justify-content-center">
+                    <button id="submit" type="submit" class="ibtn">Add User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        /* Kart için stil */
+        .card {
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Şifre kuralları kartı için stil */
+        .custom-subcard {
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Form alanları için stil */
+        .custom-input {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .custom-input:focus {
+            border-color: #6e48aa;
+            box-shadow: 0 0 8px rgba(110, 72, 170, 0.3);
+        }
+
+        /* Etiketler için stil */
+        .form-label {
+            color: #6e48aa;
+            font-weight: 500;
+        }
+
+        /* Şifre kuralları için stil */
+        .list-unstyled li {
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        /* Toggle switch için ek stil */
+        .form-check.form-switch .form-check-input {
+            width: 2.5em;
+            height: 1.25em;
+            background-color: #ccc;
+            border-color: #ccc;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .form-check.form-switch .form-check-input:checked {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        .form-check.form-switch .form-check-label {
+            margin-left: 0.5em;
+            font-size: 1rem;
+            color: #6e48aa;
+        }
+
+        /* Buton için stil */
+        .ibtn {
+            background: linear-gradient(90deg, #6e48aa, #9d50bb);
+            color: #fff;
+            padding: 12px 30px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .ibtn:hover {
+            background: linear-gradient(90deg, #563d7c, #7b3e99);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+    </style>
+
+    <script>
+        // Şifre alanını dinle ve kuralları kontrol et
+        document.getElementById('password').addEventListener('input', function () {
+            const password = this.value;
+
+            // Kural 1: En az 8 karakter
+            const lengthCheck = password.length >= 8;
+            document.getElementById('length-check').innerHTML = lengthCheck
+                ? '<i class="fas fa-check-circle text-success"></i>'
+                : '<i class="fas fa-times-circle text-danger"></i>';
+
+            // Kural 2: En az bir büyük harf
+            const uppercaseCheck = /[A-Z]/.test(password);
+            document.getElementById('uppercase-check').innerHTML = uppercaseCheck
+                ? '<i class="fas fa-check-circle text-success"></i>'
+                : '<i class="fas fa-times-circle text-danger"></i>';
+
+            // Kural 3: En az bir küçük harf
+            const lowercaseCheck = /[a-z]/.test(password);
+            document.getElementById('lowercase-check').innerHTML = lowercaseCheck
+                ? '<i class="fas fa-check-circle text-success"></i>'
+                : '<i class="fas fa-times-circle text-danger"></i>';
+
+            // Kural 4: En az bir rakam
+            const digitCheck = /\d/.test(password);
+            document.getElementById('digit-check').innerHTML = digitCheck
+                ? '<i class="fas fa-check-circle text-success"></i>'
+                : '<i class="fas fa-times-circle text-danger"></i>';
+
+            // Kural 5: En az bir özel karakter
+            const specialCheck = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+            document.getElementById('special-check').innerHTML = specialCheck
+                ? '<i class="fas fa-check-circle text-success"></i>'
+                : '<i class="fas fa-times-circle text-danger"></i>';
+
+            // Kural 6: Boşluk içermemeli
+            const noSpaceCheck = !/\s/.test(password);
+            document.getElementById('no-space-check').innerHTML = noSpaceCheck
+                ? '<i class="fas fa-check-circle text-success"></i>'
+                : '<i class="fas fa-times-circle text-danger"></i>';
+        });
+    </script>
+{% endblock %}

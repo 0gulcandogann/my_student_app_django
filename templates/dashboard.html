@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/iofrm-style.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/iofrm-theme35.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.png' %}">
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Yan menü stilleri */
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #1a1a1a;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+        }
+
+        .sidebar a {
+            padding: 12px 8px 12px 32px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #b0b0b0;
+            display: flex;
+            align-items: center;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover {
+            color: #ffffff;
+            background-color: #333;
+        }
+
+        .sidebar .closebtn {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+            margin-left: 50px;
+            color: #b0b0b0;
+        }
+
+        .sidebar .closebtn:hover {
+            color: #ffffff;
+        }
+
+        .openbtn {
+            font-size: 20px;
+            cursor: pointer;
+            background-color: #1a1a1a;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+        }
+
+        .openbtn:hover {
+            background-color: #333;
+        }
+
+        #main {
+            transition: margin-left .5s;
+            padding: 16px;
+        }
+
+        /* Kullanıcı bilgileri kartı */
+        .user-info-card {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* İkonlar için ek stil */
+        .sidebar a i {
+            margin-right: 15px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Toast mesajları için stil */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+
+        .toast {
+            min-width: 300px;
+            border-radius: 5px;
+        }
+
+        .toast-success {
+            background-color: #d4edda !important;
+            border-color: #28a745 !important;
+            color: #155724 !important;
+        }
+
+        .toast-danger {
+            background-color: #f8d7da !important;
+            border-color: #dc3545 !important;
+            color: #721c24 !important;
+        }
+
+        .toast-info {
+            background-color: #d1ecf1 !important;
+            border-color: #17a2b8 !important;
+            color: #0c5460 !important;
+        }
+
+        /* Açılır kapanır menü için ek stil */
+        .accordion-button {
+            background-color: #1a1a1a !important;
+            color: #b0b0b0 !important;
+            font-size: 18px !important;
+            padding: 12px 32px !important;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .accordion-button:not(.collapsed) {
+            color: #ffffff !important;
+            background-color: #2a2a2a !important;
+        }
+
+        .accordion-button:hover {
+            color: #ffffff !important;
+            background-color: #333 !important;
+        }
+
+        .accordion-button:focus {
+            box-shadow: none !important;
+        }
+
+        .accordion-button::after {
+            font-family: "Font Awesome 5 Free";
+            content: "\f078";
+            font-weight: 900;
+            position: absolute;
+            right: 20px;
+            color: #b0b0b0;
+            transition: transform 0.3s ease;
+        }
+
+        .accordion-button:not(.collapsed)::after {
+            content: "\f077";
+            transform: rotate(180deg);
+            color: #ffffff;
+        }
+
+        .accordion-body {
+            background-color: #222 !important;
+            padding: 0 !important;
+        }
+
+        .accordion-body a {
+            padding: 12px 8px 12px 48px !important;
+            font-size: 16px !important;
+            color: #b0b0b0 !important;
+            display: flex !important;
+            align-items: center !important;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .accordion-body a i {
+            margin-right: 15px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .accordion-body a:hover {
+            color: #ffffff !important;
+            background-color: #444 !important;
+        }
+
+        .accordion-button i {
+            margin-right: 15px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Öğrenci kartları için stil */
+        .student-card {
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .student-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .student-photo-container {
+            width: 80px;
+            height: 80px;
+            position: relative;
+        }
+
+        .student-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .student-photo:hover {
+            transform: scale(1.1);
+        }
+
+        .photo-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f1f3f5;
+            border-radius: 50%;
+            color: #6e48aa;
+            font-size: 2rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Bilgi metinleri için stil */
+        h5 {
+            color: #333;
+            font-weight: 600;
+        }
+
+        p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        /* Modal için stil */
+        .modal-dialog {
+            max-width: 800px;
+            margin: 1.75rem auto;
+        }
+
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            max-height: 80vh;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+            color: #6e48aa;
+            padding: 15px 20px;
+        }
+
+        .modal-title {
+            font-weight: 600;
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            max-height: calc(80vh - 120px);
+            background-color: #fff;
+            color: #333;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+            padding: 15px 20px;
+        }
+
+        /* Modal backdrop */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        /* Modal içindeki öğrenci bilgileri için stil */
+        .student-info-container {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .student-info-container .photo-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .student-info-container .photo-container:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .student-info-container .photo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .student-info-container .photo-container .photo-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f1f3f5;
+            color: #6e48aa;
+            font-size: 2.5rem;
+        }
+
+        .student-info-container .info-details p {
+            margin: 0 0 8px;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .student-info-container .info-details p strong {
+            color: #6e48aa;
+            font-weight: 500;
+        }
+
+        /* Alert için stil */
+        .custom-alert {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            font-style: italic;
+            color: #666;
+        }
+
+        .text-black {
+            color: #000 !important;
+        }
+
+        /* İki sütunlu yapı için stil */
+        .student-columns {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .student-column {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .student-column h3 {
+            color: #6e48aa;
+            margin-bottom: 15px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Arama çubuğu için stil */
+        .search-bar {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 10px 40px 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .search-bar input:focus {
+            border-color: #6e48aa;
+            box-shadow: 0 0 8px rgba(110, 72, 170, 0.3);
+            outline: none;
+        }
+
+        .search-bar .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6e48aa;
+            font-size: 1.2rem;
+        }
+
+        /* Learning path için stil */
+        .learning-path {
+            background: linear-gradient(145deg, #f5f7fa, #e9ecef);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            overflow-x: auto;
+        }
+
+        .learning-path h6 {
+            color: #6e48aa;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Learning path container (yatay akış) */
+        .learning-path-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: nowrap;
+            position: relative;
+            min-width: max-content;
+        }
+
+        /* Learning path aşamaları için stil (küçük kartlar) */
+        .learning-path-item {
+            flex: 0 0 200px;
+            min-height: 180px;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .learning-path-item.completed {
+            background: linear-gradient(135deg, #e6f4ea, #d4edda);
+            border: 2px solid #28a745;
+        }
+
+        .learning-path-item.active {
+            background: linear-gradient(135deg, #f0e9ff, #e2d6ff);
+            border: 2px solid #6e48aa;
+        }
+
+        .learning-path-item.pending {
+            background: linear-gradient(135deg, #f8f9fa, #eceff1);
+            border: 2px solid #b0bec5;
+        }
+
+        .learning-path-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .learning-path-item h6 {
+            margin-bottom: 10px;
+            color: #2d3748;
+            font-size: 1rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .learning-path-item h6::before {
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+        }
+
+        .learning-path-item.completed h6::before {
+            content: "\f00c";
+            color: #28a745;
+        }
+
+        .learning-path-item.active h6::before {
+            content: "\f005";
+            color: #6e48aa;
+        }
+
+        .learning-path-item.pending h6::before {
+            content: "\f017";
+            color: #b0bec5;
+        }
+
+        .learning-path-item p {
+            margin: 0 0 5px;
+            font-size: 0.85rem;
+            color: #4a5568;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .learning-path-item p strong {
+            color: #6e48aa;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* SVG Oklar için stil */
+        .learning-path-arrow {
+            flex: 0 0 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .learning-path-arrow svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .learning-path-arrow svg path {
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            animation: draw 1.5s forwards;
+        }
+
+        @keyframes draw {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .learning-path-arrow:hover svg path {
+            animation: pulse 0.8s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Ok renkleri */
+        .learning-path-arrow.completed svg path {
+            stroke: #34c759;
+            filter: drop-shadow(0 0 5px rgba(52, 199, 89, 0.4));
+        }
+
+        .learning-path-arrow.active svg path {
+            stroke: #9d50bb;
+            filter: drop-shadow(0 0 5px rgba(157, 80, 187, 0.4));
+        }
+
+        .learning-path-arrow.pending svg path {
+            stroke: #b0bec5;
+            filter: drop-shadow(0 0 5px rgba(176, 190, 197, 0.4));
+        }
+
+        /* Responsive tasarım */
+        @media (max-width: 768px) {
+            .student-columns {
+                flex-direction: column;
+            }
+
+            .openbtn {
+                font-size: 16px;
+                padding: 8px 12px;
+            }
+
+            .student-info-container {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .student-info-container .photo-container {
+                margin-bottom: 20px;
+            }
+
+            .learning-path-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 30px;
+            }
+
+            .learning-path-item {
+                flex: 0 0 auto;
+                width: 100%;
+                max-width: 320px;
+                margin-bottom: 20px;
+            }
+
+            .learning-path-arrow {
+                flex: 0 0 40px;
+                width: 40px;
+                height: 40px;
+            }
+
+            .learning-path-arrow svg {
+                transform: rotate(90deg);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .modal-dialog {
+                max-width: 90%;
+                margin: 1rem auto;
+            }
+
+            .modal-content {
+                max-height: 85vh;
+            }
+
+            .modal-body {
+                padding: 15px;
+                max-height: calc(85vh - 110px);
+            }
+
+            .learning-path-item {
+                max-width: 280px;
+            }
+
+            .learning-path-item h6 {
+                font-size: 0.9rem;
+            }
+
+            .learning-path-item p {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Yan Menü -->
+    <div id="mySidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+        <a href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+
+        {% if user.is_admin %}
+        <!-- User Management Menüsü -->
+        <div class="accordion" id="userManagementAccordion">
+            <div class="accordion-item" style="background-color: #1a1a1a; border: none;">
+                <h2 class="accordion-header" id="userManagementHeading">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#userManagementCollapse" aria-expanded="false" aria-controls="userManagementCollapse">
+                        <i class="fas fa-users-cog"></i> User Settings
+                    </button>
+                </h2>
+                <div id="userManagementCollapse" class="accordion-collapse collapse" aria-labelledby="userManagementHeading" data-bs-parent="#userManagementAccordion">
+                    <div class="accordion-body">
+                        <a href="{% url 'add_user' %}"><i class="fas fa-user-plus"></i> Add User</a>
+                        <a href="{% url 'list_users' %}"><i class="fas fa-users"></i> List Users</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Management Menüsü -->
+        <div class="accordion" id="studentManagementAccordion">
+            <div class="accordion-item" style="background-color: #1a1a1a; border: none;">
+                <h2 class="accordion-header" id="studentManagementHeading">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#studentManagementCollapse" aria-expanded="false" aria-controls="studentManagementCollapse">
+                        <i class="fas fa-user-graduate"></i> Student Management
+                    </button>
+                </h2>
+                <div id="studentManagementCollapse" class="accordion-collapse collapse" aria-labelledby="studentManagementHeading" data-bs-parent="#studentManagementAccordion">
+                    <div class="accordion-body">
+                        <a href="{% url 'add_student' %}"><i class="fas fa-user-plus"></i> Add Student</a>
+                        <a href="{% url 'list_student' %}"><i class="fas fa-user-friends"></i> List Students</a>
+                        <a href="{% url 'manage_learning_paths' %}"><i class="fas fa-road"></i> Manage Learning Paths</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <a href="{% url 'logout' %}"><i class="fas fa-right-from-bracket"></i> Logout</a>
+    </div>
+
+    <!-- Ana İçerik -->
+    <div id="main">
+        <!-- Hamburger Menü Butonu -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <button class="openbtn" onclick="openNav()">☰ Menu</button>
+        </div>
+
+        <!-- Toast Mesajları -->
+        {% if messages %}
+            <div class="toast-container">
+                {% for message in messages %}
+                    <div class="toast toast-{{ message.tags }}" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
+                        <div class="toast-body">
+                            {{ message }}
+                            <button type="button" class="oyo-btn-close float-end" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Kullanıcı Bilgileri -->
+        {% if user.is_admin and show_user_info %}
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="user-info-card">
+                        <h3 class="font-md">User Information</h3>
+                        <p><strong>Email:</strong> {{ request.session.user_email }}</p>
+                        <p><strong>First Name:</strong> {{ user.first_name|default:"-" }}</p>
+                        <p><strong>Last Name:</strong> {{ user.last_name|default:"-" }}</p>
+                        <p><strong>Admin Status:</strong> {{ user.is_admin|yesno:"Yes,No" }}</p>
+                        <p><strong>Account Created:</strong> {{ user.created_at }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- İçerik Alanı -->
+        <div class="container mt-4">
+            {% block content %}
+                <h3>Welcome to the Dashboard</h3>
+                <p>This is your dashboard. Use the sidebar to navigate.</p>
+
+                <!-- Öğrenci Kartları (Sadece Adminler için) -->
+                {% if user.is_admin %}
+                <div class="mt-4">
+                    <div class="student-columns">
+                        <!-- Çözmez Öğrenciler (Sol Sütun) -->
+                        <div class="student-column">
+                            <h3>Çömez Öğrenciler</h3>
+                            <!-- Arama Çubuğu -->
+                            <div class="search-bar">
+                                <input type="text" id="cozmaz-search" placeholder="Search students..." onkeyup="filterStudents('cozmaz')">
+                                <i class="fas fa-search search-icon"></i>
+                            </div>
+                            <div id="cozmaz-student-list">
+                                {% if cozmaz_students %}
+                                    {% for student in cozmaz_students %}
+                                        <div class="card shadow-lg mb-3 student-card" data-bs-toggle="modal" data-bs-target="#studentModal{{ student.id }}" data-name="{{ student.first_name }} {{ student.last_name }}" data-id="{{ student.student_id }}">
+                                            <div class="d-flex align-items-center p-3">
+                                                <!-- Sol Tarafta Fotoğraf -->
+                                                <div class="student-photo-container me-3">
+                                                    {% if student.photo %}
+                                                        <img src="/media/{{ student.photo }}" alt="{{ student.first_name }} {{ student.last_name }}" class="student-photo">
+                                                    {% else %}
+                                                        <div class="photo-placeholder">
+                                                            <i class="fas fa-user"></i>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <!-- Sağ Tarafta Bilgiler -->
+                                                <div class="flex-grow-1">
+                                                    <h5 class="mb-1">{{ student.first_name }} {{ student.last_name }}</h5>
+                                                    <p class="mb-1"><strong>Student ID:</strong> {{ student.student_id }}</p>
+                                                    <p class="mb-1"><strong>Created At:</strong> {{ student.created_at }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="studentModal{{ student.id }}" tabindex="-1" aria-labelledby="studentModalLabel{{ student.id }}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="studentModalLabel{{ student.id }}">Student Details - {{ student.first_name }} {{ student.last_name }}</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <!-- Öğrenci Bilgileri -->
+                                                        <div class="student-info-container">
+                                                            <!-- Profil Resmi -->
+                                                            <div class="photo-container">
+                                                                {% if student.photo %}
+                                                                    <img src="/media/{{ student.photo }}" alt="{{ student.first_name }} {{ student.last_name }}">
+                                                                {% else %}
+                                                                    <div class="photo-placeholder">
+                                                                        <i class="fas fa-user"></i>
+                                                                    </div>
+                                                                {% endif %}
+                                                            </div>
+                                                            <!-- Detaylar -->
+                                                            <div class="info-details">
+                                                                <p><strong>Student ID:</strong> {{ student.student_id }}</p>
+                                                                <p><strong>First Name:</strong> {{ student.first_name }}</p>
+                                                                <p><strong>Last Name:</strong> {{ student.last_name }}</p>
+                                                                <p><strong>Created At:</strong> {{ student.created_at }}</p>
+                                                                <p><strong>Level:</strong> {{ student.get_level_display }}</p>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Learning Path -->
+                                                        <div class="learning-path">
+                                                            <h6>Learning Path</h6>
+                                                            {% with learning_paths=student.learning_paths.all|dictsort:"order" %}
+                                                                {% if learning_paths %}
+                                                                    <div class="learning-path-container">
+                                                                        {% for path in learning_paths %}
+                                                                            <!-- Aktif aşamayı belirlemek için: Önceki tüm aşamalar tamamlanmış olmalı -->
+                                                                            {% with is_active=False %}
+                                                                                {% if forloop.first %}
+                                                                                    {% if not path.is_completed %}
+                                                                                        {% with is_active=True %}
+                                                                                            <div class="learning-path-item {% if path.is_completed %}completed{% elif is_active %}active{% else %}pending{% endif %}">
+                                                                                                <h6>{{ path.task_name }} (Step {{ path.order }})</h6>
+                                                                                                <p><strong>Start:</strong> {{ path.start_date|date:"Y-m-d" }}</p>
+                                                                                                <p><strong>End:</strong> {{ path.estimated_end_date|date:"Y-m-d" }}</p>
+                                                                                                <p><strong>Duration:</strong> {{ path.required_duration }}</p>
+                                                                                                {% if path.used_leave %}
+                                                                                                    <p><strong>Leave:</strong> {{ path.used_leave }}</p>
+                                                                                                {% endif %}
+                                                                                                {% if path.notes %}
+                                                                                                    <p><strong>Notes:</strong> {{ path.notes|truncatechars:15 }}</p>
+                                                                                                {% endif %}
+                                                                                            </div>
+                                                                                        {% endwith %}
+                                                                                    {% else %}
+                                                                                        <div class="learning-path-item {% if path.is_completed %}completed{% elif is_active %}active{% else %}pending{% endif %}">
+                                                                                            <h6>{{ path.task_name }} (Step {{ path.order }})</h6>
+                                                                                            <p><strong>Start:</strong> {{ path.start_date|date:"Y-m-d" }}</p>
+                                                                                            <p><strong>End:</strong> {{ path.estimated_end_date|date:"Y-m-d" }}</p>
+                                                                                            <p><strong>Duration:</strong> {{ path.required_duration }}</p>
+                                                                                            {% if path.used_leave %}
+                                                                                                <p><strong>Leave:</strong> {{ path.used_leave }}</p>
+                                                                                            {% endif %}
+                                                                                            {% if path.notes %}
+                                                                                                <p><strong>Notes:</strong> {{ path.notes|truncatechars:15 }}</p>
+                                                                                            {% endif %}
+                                                                                        </div>
+                                                                                    {% endif %}
+                                                                                {% else %}
+                                                                                    {% with previous_path=learning_paths|slice:":forloop.counter0"|last %}
+                                                                                        {% if previous_path.is_completed and not path.is_completed %}
+                                                                                            {% with is_active=True %}
+                                                                                                <div class="learning-path-item {% if path.is_completed %}completed{% elif is_active %}active{% else %}pending{% endif %}">
+                                                                                                    <h6>{{ path.task_name }} (Step {{ path.order }})</h6>
+                                                                                                    <p><strong>Start:</strong> {{ path.start_date|date:"Y-m-d" }}</p>
+                                                                                                    <p><strong>End:</strong> {{ path.estimated_end_date|date:"Y-m-d" }}</p>
+                                                                                                    <p><strong>Duration:</strong> {{ path.required_duration }}</p>
+                                                                                                    {% if path.used_leave %}
+                                                                                                        <p><strong>Leave:</strong> {{ path.used_leave }}</p>
+                                                                                                    {% endif %}
+                                                                                                    {% if path.notes %}
+                                                                                                        <p><strong>Notes:</strong> {{ path.notes|truncatechars:15 }}</p>
+                                                                                                    {% endif %}
+                                                                                                </div>
+                                                                                            {% endwith %}
+                                                                                        {% else %}
+                                                                                            <div class="learning-path-item {% if path.is_completed %}completed{% elif is_active %}active{% else %}pending{% endif %}">
+                                                                                                <h6>{{ path.task_name }} (Step {{ path.order }})</h6>
+                                                                                                <p><strong>Start:</strong> {{ path.start_date|date:"Y-m-d" }}</p>
+                                                                                                <p><strong>End:</strong> {{ path.estimated_end_date|date:"Y-m-d" }}</p>
+                                                                                                <p><strong>Duration:</strong> {{ path.required_duration }}</p>
+                                                                                                {% if path.used_leave %}
+                                                                                                    <p><strong>Leave:</strong> {{ path.used_leave }}</p>
+                                                                                                {% endif %}
+                                                                                                {% if path.notes %}
+                                                                                                    <p><strong>Notes:</strong> {{ path.notes|truncatechars:15 }}</p>
+                                                                                                {% endif %}
+                                                                                            </div>
+                                                                                        {% endif %}
+                                                                                    {% endwith %}
+                                                                                {% endif %}
+
+                                                                                <!-- Oklar -->
+                                                                                {% if not forloop.last %}
+                                                                                    <div class="learning-path-arrow {% if path.is_completed %}completed{% elif is_active %}active{% else %}pending{% endif %}">
+                                                                                        <svg viewBox="0 0 50 50">
+                                                                                            <path d="M10 25H40M40 25L30 15M40 25L30 35" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                                        </svg>
+                                                                                    </div>
+                                                                                {% endif %}
+                                                                            {% endwith %}
+                                                                        {% endfor %}
+                                                                    </div>
+                                                                {% else %}
+                                                                    <div class="custom-alert text-black">
+                                                                        No learning path stages found for this student.
+                                                                    </div>
+                                                                {% endif %}
+                                                            {% endwith %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="custom-alert text-black">
+                                        No Çözmez students found.
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Kıdemli Öğrenciler (Sağ Sütun) -->
+                        <div class="student-column">
+                            <h3>Kıdemli Öğrenciler</h3>
+                            <!-- Arama Çubuğu -->
+                            <div class="search-bar">
+                                <input type="text" id="kidemli-search" placeholder="Search students..." onkeyup="filterStudents('kidemli')">
+                                <i class="fas fa-search search-icon"></i>
+                            </div>
+                            <div id="kidemli-student-list">
+                                {% if kidemli_students %}
+                                    {% for student in kidemli_students %}
+                                        <div class="card shadow-lg mb-3 student-card" data-bs-toggle="modal" data-bs-target="#studentModal{{ student.id }}" data-name="{{ student.first_name }} {{ student.last_name }}" data-id="{{ student.student_id }}">
+                                            <div class="d-flex align-items-center p-3">
+                                                <!-- Sol Tarafta Fotoğraf -->
+                                                <div class="student-photo-container me-3">
+                                                    {% if student.photo %}
+                                                        <img src="/media/{{ student.photo }}" alt="{{ student.first_name }} {{ student.last_name }}" class="student-photo">
+                                                    {% else %}
+                                                        <div class="photo-placeholder">
+                                                            <i class="fas fa-user"></i>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <!-- Sağ Tarafta Bilgiler -->
+                                                <div class="flex-grow-1">
+                                                    <h5 class="mb-1">{{ student.first_name }} {{ student.last_name }}</h5>
+                                                    <p class="mb-1"><strong>Student ID:</strong> {{ student.student_id }}</p>
+                                                    <p class="mb-1"><strong>Created At:</strong> {{ student.created_at }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="studentModal{{ student.id }}" tabindex="-1" aria-labelledby="studentModalLabel{{ student.id }}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="studentModalLabel{{ student.id }}">Student Details - {{ student.first_name }} {{ student.last_name }}</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <!-- Öğrenci Bilgileri -->
+                                                        <div class="student-info-container">
+                                                            <!-- Profil Resmi -->
+                                                            <div class="photo-container">
+                                                                {% if student.photo %}
+                                                                    <img src="/media/{{ student.photo }}" alt="{{ student.first_name }} {{ student.last_name }}">
+                                                                {% else %}
+                                                                    <div class="photo-placeholder">
+                                                                        <i class="fas fa-user"></i>
+                                                                    </div>
+                                                                {% endif %}
+                                                            </div>
+                                                            <!-- Detaylar -->
+                                                            <div class="info-details">
+                                                                <p><strong>Student ID:</strong> {{ student.student_id }}</p>
+                                                                <p><strong>First Name:</strong> {{ student.first_name }}</p>
+                                                                <p><strong>Last Name:</strong> {{ student.last_name }}</p>
+                                                                <p><strong>Created At:</strong> {{ student.created_at }}</p>
+                                                                <p><strong>Level:</strong> {{ student.get_level_display }}</p>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Learning Path -->
+                                                        <div class="learning-path">
+                                                            <h6>Learning Path</h6>
+                                                            {% with learning_paths=student.learning_paths.all|dictsort:"order" %}
+                                                                {% if learning_paths %}
+                                                                    <div class="learning-path-container">
+                                                                        {% for path in learning_paths %}
+                                                                            <!-- Aktif aşamayı belirlemek için: Önceki tüm aşamalar tamamlanmış olmalı -->
+                                                                            {% with is_active=False %}
+                                                                                {% if forloop.first %}
+                                                                                    {% if not path.is_completed %}
+                                                                                        {% with is_active=True %}
+                                                                                            <div class="learning-path-item {% if path.is_completed %}completed{% elif is_active %}active{% else %}pending{% endif %}">
+                                                                                                <h6>{{ path.task_name }} (Step {{ path.order }})</h6>
+                                                                                                <p><strong>Start:</strong> {{ path.start_date|date:"Y-m-d" }}</p>
+                                                                                                <p><strong>End:</strong> {{ path.estimated_end_date|date:"Y-m-d" }}</p>
+                                                                                                <p><strong>Duration:</strong> {{ path.required_duration }}</p>
+                                                                                                {% if path.used_leave %}
+                                                                                                    <p><strong>Leave:</strong> {{ path.used_leave }}</p>
+                                                                                                {% endif %}
+                                                                                                {% if path.notes %}
+                                                                                                    <p><strong>Notes:</strong> {{ path.notes|truncatechars:15 }}</p>
+                                                                                                {% endif %}
+                                                                                            </div>
+                                                                                        {% endwith %}
+                                                                                    {% else %}
+                                                                                        <div class="learning-path-item {% if path.is_completed %}completed{% elif is_active %}active{% else %}pending{% endif %}">
+                                                                                            <h6>{{ path.task_name }} (Step {{ path.order }})</h6>
+                                                                                            <p><strong>Start:</strong> {{ path.start_date|date:"Y-m-d" }}</p>
+                                                                                            <p><strong>End:</strong> {{ path.estimated_end_date|date:"Y-m-d" }}</p>
+                                                                                            <p><strong>Duration:</strong> {{ path.required_duration }}</p>
+                                                                                            {% if path.used_leave %}
+                                                                                                <p><strong>Leave:</strong> {{ path.used_leave }}</p>
+                                                                                            {% endif %}
+                                                                                            {% if path.notes %}
+                                                                                                <p><strong>Notes:</strong> {{ path.notes|truncatechars:15 }}</p>
+                                                                                            {% endif %}
+                                                                                        </div>
+                                                                                    {% endif %}
+                                                                                {% else %}
+                                                                                    {% with previous_path=learning_paths|slice:":forloop.counter0"|last %}
+                                                                                        {% if previous_path.is_completed and not path.is_completed %}
+                                                                                            {% with is_active=True %}
+                                                                                                <div class="learning-path-item {% if path.is_completed %}completed{% elif is_active %}active{% else %}pending{% endif %}">
+                                                                                                    <h6>{{ path.task_name }} (Step {{ path.order }})</h6>
+                                                                                                    <p><strong>Start:</strong> {{ path.start_date|date:"Y-m-d" }}</p>
+                                                                                                    <p><strong>End:</strong> {{ path.estimated_end_date|date:"Y-m-d" }}</p>
+                                                                                                    <p><strong>Duration:</strong> {{ path.required_duration }}</p>
+                                                                                                    {% if path.used_leave %}
+                                                                                                        <p><strong>Leave:</strong> {{ path.used_leave }}</p>
+                                                                                                    {% endif %}
+                                                                                                    {% if path.notes %}
+                                                                                                        <p><strong>Notes:</strong> {{ path.notes|truncatechars:15 }}</p>
+                                                                                                    {% endif %}
+                                                                                                </div>
+                                                                                            {% endwith %}
+                                                                                        {% else %}
+                                                                                            <div class="learning-path-item {% if path.is_completed %}completed{% elif is_active %}active{% else %}pending{% endif %}">
+                                                                                                <h6>{{ path.task_name }} (Step {{ path.order }})</h6>
+                                                                                                <p><strong>Start:</strong> {{ path.start_date|date:"Y-m-d" }}</p>
+                                                                                                <p><strong>End:</strong> {{ path.estimated_end_date|date:"Y-m-d" }}</p>
+                                                                                                <p><strong>Duration:</strong> {{ path.required_duration }}</p>
+                                                                                                {% if path.used_leave %}
+                                                                                                    <p><strong>Leave:</strong> {{ path.used_leave }}</p>
+                                                                                                {% endif %}
+                                                                                                {% if path.notes %}
+                                                                                                    <p><strong>Notes:</strong> {{ path.notes|truncatechars:15 }}</p>
+                                                                                                {% endif %}
+                                                                                            </div>
+                                                                                        {% endif %}
+                                                                                    {% endwith %}
+                                                                                {% endif %}
+                                                                                {% if not forloop.last %}
+                                                                                    <div class="learning-path-arrow {% if path.is_completed %}completed{% elif is_active %}active{% else %}pending{% endif %}">
+                                                                                        <svg viewBox="0 0 50 50">
+                                                                                            <path d="M10 25H40M40 25L30 15M40 25L30 35" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                                        </svg>
+                                                                                    </div>
+                                                                                {% endif %}
+                                                                            {% endwith %}
+                                                                        {% endfor %}
+                                                                    </div>
+                                                                {% else %}
+                                                                    <div class="custom-alert text-black">
+                                                                        No learning path stages found for this student.
+                                                                    </div>
+                                                                {% endif %}
+                                                            {% endwith %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="custom-alert text-black">
+                                        No Kıdemli students found.
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endblock %}
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script>
+        // Yan Menü Açma/Kapama Fonksiyonları
+        function openNav() {
+            document.getElementById("mySidebar").style.width = "250px";
+            document.getElementById("main").style.marginLeft = "250px";
+        }
+
+        function closeNav() {
+            document.getElementById("mySidebar").style.width = "0";
+            document.getElementById("main").style.marginLeft = "0";
+        }
+
+        // Toast Mesajlarını Gösterme
+        document.addEventListener('DOMContentLoaded', function () {
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+            var toastList = toastElList.map(function(toastEl) {
+                return new bootstrap.Toast(toastEl);
+            });
+            toastList.forEach(toast => toast.show());
+        });
+
+        // Arama Fonksiyonu
+        function filterStudents(type) {
+            var input, filter, studentList, studentCards, i, txtValue, name, id;
+            input = document.getElementById(type + '-search');
+            filter = input.value.toUpperCase();
+            studentList = document.getElementById(type + '-student-list');
+            studentCards = studentList.getElementsByClassName('student-card');
+
+            for (i = 0; i < studentCards.length; i++) {
+                name = studentCards[i].getAttribute('data-name').toUpperCase();
+                id = studentCards[i].getAttribute('data-id').toUpperCase();
+                if (name.indexOf(filter) > -1 || id.indexOf(filter) > -1) {
+                    studentCards[i].style.display = "";
+                } else {
+                    studentCards[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+</body>
+</html>

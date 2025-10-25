@@ -1,0 +1,254 @@
+{% extends 'dashboard.html' %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h3 class="font-md mb-4 text-center" style="color: #6e48aa;">Update Student</h3>
+
+        <!-- Mesajlar -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <p class="{{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="card shadow-lg p-4">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="id_photo" class="form-label">Photo (Optional):</label>
+                    <div class="photo-upload">
+                        {% if student.photo %}
+                        <div class="photo-preview">
+                            <img src="/media/{{ student.photo }}" alt="{{ student.first_name }}" class="student-photo-preview">
+                            <p>Current photo (upload a new one to replace):</p>
+                        </div>
+                        {% endif %}
+                        <div class="upload-area">
+                            <input type="file" name="photo" id="id_photo" accept="image/*" onchange="previewPhoto(event)">
+                            <label for="id_photo" class="upload-label">
+                                <i class="fas fa-upload"></i> Choose File
+                            </label>
+                            <p id="file-name">No file chosen</p>
+                        </div>
+                        <div id="photo-preview" class="photo-preview"></div>
+                    </div>
+                    {% if form.photo.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.photo.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="id_student_id" class="form-label">Student ID:</label>
+                    <input type="text" name="student_id" id="id_student_id" class="form-control custom-input" value="{{ form.student_id.value|default_if_none:'' }}" required>
+                    {% if form.student_id.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.student_id.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="id_first_name" class="form-label">First Name:</label>
+                    <input type="text" name="first_name" id="id_first_name" class="form-control custom-input" value="{{ form.first_name.value|default_if_none:'' }}" required>
+                    {% if form.first_name.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.first_name.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="id_last_name" class="form-label">Last Name:</label>
+                    <input type="text" name="last_name" id="id_last_name" class="form-control custom-input" value="{{ form.last_name.value|default_if_none:'' }}" required>
+                    {% if form.last_name.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.last_name.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="id_level" class="form-label">Level:</label>
+                    <select name="level" id="id_level" class="form-control custom-input" required>
+                        <option value="çözmez" {% if student.level == 'çözmez' %}selected{% endif %}>Çömez</option> <!-- Zaten düzeltilmiş -->
+                        <option value="kıdemli" {% if student.level == 'kıdemli' %}selected{% endif %}>Kıdemli</option>
+                    </select>
+                </div>
+                <div class="form-button d-flex justify-content-center">
+                    <button type="submit" class="ibtn">Update Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        /* Kart için stil */
+        .card {
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Form alanları için stil */
+        .form-control.custom-input {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control.custom-input:focus {
+            border-color: #6e48aa;
+            box-shadow: 0 0 8px rgba(110, 72, 170, 0.3);
+            outline: none;
+        }
+
+        /* Etiketler için stil */
+        .form-label {
+            color: #6e48aa;
+            font-weight: 500;
+        }
+
+        /* Fotoğraf yükleme alanı için stil */
+        .photo-upload {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+        .photo-upload:hover {
+            border-color: #6e48aa;
+            background-color: #f1f3f5;
+        }
+
+        .photo-preview {
+            margin-bottom: 15px;
+        }
+
+        .student-photo-preview {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+        }
+
+        .upload-area {
+            position: relative;
+        }
+
+        .upload-area input[type="file"] {
+            display: none;
+        }
+
+        .upload-label {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(90deg, #6e48aa, #9d50bb);
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-label:hover {
+            background: linear-gradient(90deg, #563d7c, #7b3e99);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .upload-label i {
+            margin-right: 5px;
+        }
+
+        #file-name {
+            margin-top: 10px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        #photo-preview img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-top: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Buton için stil */
+        .ibtn {
+            background: linear-gradient(90deg, #6e48aa, #9d50bb);
+            color: #fff;
+            padding: 12px 30px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .ibtn:hover {
+            background: linear-gradient(90deg, #563d7c, #7b3e99);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Hata mesajları için stil */
+        .errorlist {
+            color: red;
+            list-style: none;
+            padding: 0;
+            margin: 5px 0 0 0;
+            font-size: 0.9rem;
+        }
+
+        /* Mesajlar için stil */
+        .messages {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .messages .success {
+            color: green;
+            font-weight: bold;
+        }
+        .messages .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+
+    <script>
+        // Fotoğraf seçildiğinde dosya adını göster ve önizleme yap
+        function previewPhoto(event) {
+            const file = event.target.files[0];
+            const fileNameDisplay = document.getElementById('file-name');
+            const preview = document.getElementById('photo-preview');
+
+            if (file) {
+                fileNameDisplay.textContent = file.name;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Photo Preview">`;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                fileNameDisplay.textContent = 'No file chosen';
+                preview.innerHTML = '';
+            }
+        }
+    </script>
+{% endblock %}

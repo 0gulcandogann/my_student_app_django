@@ -1,0 +1,197 @@
+<!-- student_management/templates/login.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+    <!-- FontAwesome Resmi CDN -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/iofrm-style.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/iofrm-theme35.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.png' %}">
+    <style>
+        /* Sayfanın genel stili */
+        body {
+            background: linear-gradient(135deg, #6e48aa, #9d50bb); /* Mor tonlarında gradyan arka plan */
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Kart stili */
+        .login-card {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            padding: 2rem;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        /* Başlık stili */
+        .login-card h2 {
+            color: #6e48aa; /* Mor renk */
+            font-size: 1.75rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Alt başlık stili */
+        .login-card p {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Form alanları */
+        .form-control {
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            border-color: #6e48aa;
+            box-shadow: 0 0 5px rgba(110, 72, 170, 0.3);
+        }
+
+        /* Buton stili */
+        .btn-login {
+            background-color: #6e48aa; /* Mor arka plan */
+            color: #fff; /* Beyaz yazı */
+            padding: 10px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            transition: all 0.3s ease; /* Yumuşak geçiş */
+            width: 100%;
+        }
+
+        .btn-login:hover {
+            background-color: #563d7c; /* Daha koyu mor */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Hafif gölge efekti */
+        }
+
+        /* Toast mesajları için stil */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+
+        .toast {
+            min-width: 300px;
+            border-radius: 5px;
+        }
+
+        .toast-success {
+            background-color: #d4edda !important;
+            border-color: #28a745 !important;
+            color: #155724 !important;
+        }
+
+        .toast-error {  /* message.tags 'error' ile uyumlu */
+            background-color: #f8d7da !important;
+            border-color: #dc3545 !important;
+            color: #721c24 !important;
+        }
+
+        .toast-info {
+            background-color: #d1ecf1 !important;
+            border-color: #17a2b8 !important;
+            color: #0c5460 !important;
+        }
+
+        /* Alıntı stili */
+        .quote {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-style: italic;
+            color: #555;
+            font-size: 0.95rem;
+            position: relative;
+        }
+
+        .quote::before {
+            content: '\f10d'; /* FontAwesome tırnak işareti */
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            color: #6e48aa;
+            font-size: 1.2rem;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: -1.5rem;
+        }
+
+        .quote span {
+            display: block;
+            margin-top: 0.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h2>Login to account</h2>
+        <p>Welcome, please enter your credentials.</p>
+        <form method="POST" action="{% url 'login' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <input class="form-control" type="email" name="email" placeholder="E-mail Address" required>
+            </div>
+            <div class="mb-3">
+                <input class="form-control" type="password" name="password" placeholder="Password" required>
+            </div>
+            <div class="form-button">
+                <button type="submit" class="btn-login">Login</button>
+            </div>
+        </form>
+        <!-- Mustafa Kemal Atatürk'ün sözü -->
+        <div class="quote">
+            "Beni Türk Hekimlerine Emanet Edin"
+            <span>- Mustafa Kemal Atatürk</span>
+        </div>
+    </div>
+
+    <!-- Toast Mesajları -->
+    {% if messages %}
+        <div class="toast-container">
+            {% for message in messages %}
+                <div class="toast toast-{{ message.tags }}" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
+                    <div class="toast-body">
+                        {{ message }}
+                        <button type="button" class="btn-close float-end" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- JavaScript -->
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        // Toast mesajlarını otomatik olarak göster
+        document.addEventListener('DOMContentLoaded', function () {
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+            var toastList = toastElList.map(function(toastEl) {
+                return new bootstrap.Toast(toastEl);
+            });
+            toastList.forEach(toast => toast.show());
+        });
+    </script>
+</body>
+</html>
